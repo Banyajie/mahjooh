@@ -1,0 +1,352 @@
+###南昌麻将游戏逻辑
+
+####1：江西麻将基本数据结构
+	1： /*一副江西南昌麻将的所有牌*/
+	var MajPool = []int{
+		1, 2, 3, 4, 5, 6, 7, 8, 9, //万
+		1, 2, 3, 4, 5, 6, 7, 8, 9,
+		1, 2, 3, 4, 5, 6, 7, 8, 9,
+		1, 2, 3, 4, 5, 6, 7, 8, 9,
+		11, 12, 13, 14, 15, 16, 17, 18, 19, //筒
+		11, 12, 13, 14, 15, 16, 17, 18, 19,
+		11, 12, 13, 14, 15, 16, 17, 18, 19,
+		11, 12, 13, 14, 15, 16, 17, 18, 19,
+		21, 22, 23, 24, 25, 26, 27, 28, 29, //条
+		21, 22, 23, 24, 25, 26, 27, 28, 29,
+		21, 22, 23, 24, 25, 26, 27, 28, 29,
+		21, 22, 23, 24, 25, 26, 27, 28, 29,
+		31, 32, 33, 34, 31, 32, 33, 34, //东南西北
+		31, 32, 33, 34, 31, 32, 33, 34, //东南西北
+		41, 42, 43, 41, 42, 43, //中 发 白
+		41, 42, 43, 41, 42, 43, //中 发 白
+	}
+	
+	2：
+####2：江西麻将玩法流程
+	1：洗牌
+	2：定庄
+	3：发牌
+	4：吃碰杠胡
+	5：结算
+####3：app发送给服务器websocket消息类型
+	const (
+		RCV_PLAYER_INTO_ROOM    = iota //进入房间
+		RCV_PLAYER_OUT_ROOM            //退出房间
+		RCV_REQ_BANKER                 //请求庄家ID
+		RCV_PLAY_A_HAND                //出牌
+		RCV_EAT                        //吃牌
+		RCV_ALT                        //碰牌
+		RCV_BRIGHT_BAR                 //明杠
+		RCV_ADD_BAR                    //补杠
+		RCV_DARK_BAR                   //暗杠
+		RCV_PASS                       //pass
+		RCV_WIN                        //胡牌
+		RCV_PLAYER_DOWN                //掉线
+		RCV_PLAYER_RECONNECTION        //掉线重连
+		
+		RCV_RMREMATCH                  //再来一局
+		RCV_DISCARD_ROOM               //解散房间
+		
+		RCV_SHUFFLE                    //洗牌完成
+        RCV_DECIDE_BANKER              //定庄色子完成
+        RCV_SHOW_UNIVERSE_END          //精牌展示完成
+
+
+	    RCV_DISCARD_CONFIRM            //确认解散房间
+	    RCV_DISCARD_CANCEL             //取消解散房间
+	)
+	
+	消息结构：
+		//通信过程中客户端发送的消息格式
+			type MessClient struct {
+			RoomId   int64  `json:"room_id"`   //房间ID
+			UserId   int64  `json:"user_id"`   //玩家ID
+			UserName string `json:"user_name"` //玩家姓名
+			HeadImg  string `json:"head_img"`  //玩家头像
+			SeatId   int    `json:"seat_id"`   //玩家座位ID
+			MessType int    `json:"mess_type"` //type
+			MessData []int  `json:"mess_data"` //data
+		}
+		
+####4：app发送的消息说明
+		RCV_PLAY_A_HAND                //出牌
+			MessData; []int{pai}
+		RCV_EAT                        //吃牌
+			MessData: []int{pai, pai, pai}
+			
+		其余的都没有数据 nil
+####5：服务器发送给app的websocket消息类型
+	const (
+		SEND_PREROUND_DEAL       = iota //首轮发牌
+		SEND_DEAL                       //发牌
+		SEND_PLAY_A_HAND                //玩家出牌
+		SEND_MAY_ACTION                 //玩家可以对其他玩家出的牌有所动作
+		SEND_EAT                        //玩家吃牌
+		SEND_ALT                        //玩家碰牌
+		SEND_BRIGHT_BAR                 //玩家明杠
+		SEND_ADD_BAR                    //玩家补杠
+		SEND_DARK_BAR                   //玩家暗杠
+		SEND_WIN                        //玩家胡牌
+		SEND_GAME_OVER                  //游戏结束
+		SEND_SYNC_HAND                  //同步玩家手牌
+		SEND_SYNC_POINT                 //告诉玩家当前控牌ID
+		SEND_PLAYER_IN_ROOM             //玩家进入房间
+		SEND_BANKER_ID                  //告诉玩家庄家ID
+		SEND_PLAYER_OUT_ROOM            //玩家退出房间
+		SEND_PLAYER_HAND                //玩家的手牌
+		SEND_PLAYER_DOWN                //玩家掉线
+		SEND_PLAYER_RECONNECTION        //玩家掉线重连
+		SEND_PLAYER_MONEY               //玩家的金额
+		SEND_MATCH_OVER                 //游戏已结束
+		
+		SEND_DICE_BANKER                //定庄色子
+		SEND_DICE_UNIVERSE              //定精色子
+		SEND_UNIVERSE                   //精牌
+		SEND_RMREMATCH                  //再来一局
+
+		SEND_APPLY_DISCARD_ROOM               //申请解散房间
+		
+		SEND_MATCH_USEUP                //房卡局数已用完
+		
+		SEND_RESETTIMER                 //重置时间
+		
+	    SEND_UNIVERSE_NUM               //精牌的数量
+	    
+	    SEND_START_SHUFFLE              //开始洗牌
+
+	    SEND_TOTAL_SCORE                //玩家总分
+	    SEND_PLAYER_UP                  //玩家上线
+
+	    SEND_DISCARD_CONFIRM            //确认解散房间
+	    SEND_DISCARD_CENCEL             //取消解散房间
+	    SEND_DISCARD_ROOM               //解散房间
+	)
+	
+		//通信过程中服务器发送的消息格式
+		type Message struct {
+			RoomId            int64       `json:"room_id"`             //房间ID
+			UserId            int64       `json:"user_id"`             //玩家ID
+			SeatId            int         `json:"seat_id"`             //玩家座位ID
+			CurrentId         int         `json:"current_id"`          //当前控牌玩家ID
+			CurrentPlayerName string      `json:"current_player_name"` //当前控牌玩家名字
+			TimeStamp         int64       `json:"time_stamp"`          //发送消息时的时间戳
+			MessType          int         `json:"mess_type"`           //type
+			MessData          interface{} `json:"mess_data"`           //data
+			LeftNum           int         `json:"left_num"`            //当前牌局还剩多少牌
+		}
+
+####6：服务器发送的消息说明
+	1：SEND_PREROUND_DEAL       = iota     //首轮发牌
+		过程：从庄家开始，按4 4 4 1 的个数发牌，直到没人十三张牌
+		MessData: 如果是4张牌，数据是 int 数组
+		MessData: 如果是1张牌，数据是值
+		
+	2：SEND_DEAL                       //发牌
+		游戏过程中给某一个玩家发牌
+		MessData:    发牌玩家    pai值
+				     其他玩家    0
+	
+	3：SEND_PLAY_A_HAND                //玩家出牌
+		MessData:    牌值
+		
+	4：SEND_MAY_ACTION                 //玩家可以对其他玩家出的牌有所动作
+		const (
+			ACTION_EAT        = 1  //吃
+			ACTION_ALT        = 2  //碰
+			ACTION_BRIGHT_BAR = 4  //明杠
+			ACTION_ADD_BAR    = 8  //加杠
+			ACTION_DACK_BAR   = 16 //暗杠
+			ACTION_HU         = 32 //胡牌
+		)
+		假如：value = ACTION_EAT | ACTION_ALT   代表即可以吃也可以碰
+		
+		MessData: int数组  {action, pai值}
+		action 为暗杠的时候   pai值是可以暗杠的 牌
+		其他动作  pai值是当前牌
+		
+	5：SEND_EAT                        //玩家吃牌
+		MessData： []int{出牌人座位号， pai， pai， pai}
+		
+	6：SEND_ALT                        //玩家碰牌
+		MessData: []int{出牌人座位号， pai}
+		
+	7：SEND_BRIGHT_BAR                 //玩家明杠
+		MessData: []int{出牌人座位号， pai} 
+		
+	8：SEND_ADD_BAR                    //玩家补杠/加杠
+		MessData:  pai
+		
+	9：SEND_DARK_BAR                   //玩家暗杠
+		MessData: pai
+		
+	10：SEND_WIN                        //玩家胡牌
+		MessData:   windata
+			/*胡牌的数据结构*/
+			type Win struct {
+				Selfdrawn bool  `json:"selfdrawn"` //是否是自摸
+				Award     []int `json:"award"`     //胡牌的奖励  int 数组
+				Share     int   `json:"share"`     //胡的那张牌
+				Loser     int   `json:"loser"`     //点炮的玩家
+			}
+			/*胡牌的奖励*/
+			const (
+				HU_AWARD_TYPE_SELFDRAWN          = iota +1//自摸   *2
+				HU_AWARD_TYPE_GRABBAR                   //抢杠   *2
+				HU_AWARD_TYPE_BAR                       //杠开   *2
+				HU_AWARD_TYPE_GOD                       //天胡   +20
+				HU_AWARD_TYPE_LAND                      //地胡   +20
+				HU_AWARD_TYPE_JING_DIAO                 //精钓   *2
+				HU_AWARD_TYPE_LITTLE_SEVEN              //小七对 *2
+				HU_AWARD_TYPE_BIG_SEVEN                 //大七对 *2
+				HU_AWARD_TYPE_THIRTEEN                  //十三烂 *2
+				HU_AWARD_TYPE_SEVENSTAR_THIRTEEN        //七星十三烂 *4
+				HU_AWARD_TYPE_DEGUO                     //德国  自摸时每家×2+5  否则点炮者×2
+				HU_AWARD_TYPE_DEZHONGDE                 //德中德  自摸时每家×4+5  否则点炮者×4
+			)
+			
+			
+	11：SEND_GAME_OVER                  //游戏结束
+		MessData: 玩家的流水   []scorewarter
+			type Score struct {
+				UserName string `json:"user_name"` //产生此条流水的玩家名字
+				Type     int    `json:"type"`      //流水类型
+				Score    int    `json:"score"`     //分数
+			}
+			流水类型：
+			const (
+				    SCORE_TYPE_BRIGHT_BAR    = iota + 1 //明杠 +1
+                	SCORE_TYPE_DARK_BAR                 //暗杠 +2
+                	SCORE_TYPE_UP_JING                  //上精  正精+2  副精+1
+                	SCORE_TYPE_SEARCH_BANKER            //抄庄 +5
+                	SCORE_TYPE_PING_HU                  //平胡
+                	SCORE_TYPE_SELFDRAWN_HU             //自摸
+                	SCORE_TYPE_SMILE                    //回头一笑
+                	SCORE_TYPE_LANDMINES                //埋地雷
+                	SCORE_TYPE_OPENING                  //开局上下翻
+			)
+			
+			
+	12：SEND_SYNC_HAND                  //同步玩家手牌
+		MessData: 	
+			type reconnection struct {
+				SeatId      int    `json:"seat_id"`
+				CurrentId   int    `json:"current_id"`
+				CurrentName string `json:"current_name"`
+				Head        string `json:"head"`
+				BankId      int    `json:"bank_id"`
+				Miss        int    `json:"miss"`
+				Score       int    `json:"score"`
+				Hand        []int  `json:"hand"`
+				Eat         []int  `json:"eat"`
+				Alt         []int  `json:"alt"`
+				Ming        []int  `json:"ming"`
+				Dark        []int  `json:"dark"`
+				HavePlay    []int  `json:"have_play"`
+			}
+
+
+	13：SEND_SYNC_POINT                 //告诉玩家当前控牌ID
+		MessData: nil 空   根据currentId  判断
+		
+	14：SEND_PLAYER_IN_ROOM             //玩家进入房间
+		MessData：   
+			//玩家在房间中的基本信息
+			type Player_data struct {
+				User_Id     int64  `json:"user_id"`
+				User_Name   string `json:"user_name"`
+				User_Seat   int    `json:"user_seat"`
+				User_Status bool   `json:"user_status"`
+			}
+			
+	15：SEND_BANKER_ID                  //告诉玩家庄家ID
+		MessData:   庄家id就是座位号
+		
+	16：SEND_PLAYER_OUT_ROOM            //玩家退出房间
+		MessData:  座位号
+		
+	17：SEND_PLAYER_HAND                //玩家的手牌
+		MessData:  游戏结束时手牌字符串,  用，分割
+		
+	18：SEND_PLAYER_DOWN                //玩家掉线
+		MessData:   掉线玩家的座位号
+		
+	19：SEND_PLAYER_RECONNECTION        //玩家掉线重连
+		MessData： 
+			type reconnection struct {
+				SeatId      int    `json:"seat_id"`
+				CurrentId   int    `json:"current_id"`
+				CurrentName string `json:"current_name"`
+				Head        string `json:"head"`
+				BankId      int    `json:"bank_id"`
+				Miss        int    `json:"miss"`
+				Score       int    `json:"score"`
+	            MScore      int    `json:"m_score"`
+				Hand        []int  `json:"hand"`
+				Eat         []int  `json:"eat"`
+				Alt         []int  `json:"alt"`
+				Ming        []int  `json:"ming"`
+				Dark        []int  `json:"dark"`
+				HavePlay    []int  `json:"have_play"`
+			}
+
+	20：SEND_PLAYER_MONEY               //玩家的金额
+		MessData:  []int{玩家座位号， 金额}
+		
+	21：SEND_MATCH_OVER                 //游戏已结束，玩家掉线重连时
+		Messdata: nil
+		
+	22：SEND_DICE_BANKER                //定庄色子
+		MessData: []int{num1, num2}
+		
+	23：SEND_DICE_UNIVERSE              //定精色子
+		MessData: []int{num1, num2}
+		
+	24：SEND_UNIVERSE                   //精牌
+		MessData: []int{上精， 下精}
+			根据游戏规则是否显示下精  
+			
+	25：SEND_RMREMATCH                  //再来一局
+		Messdata: seat_id
+		
+	26：SEND_APPLY_DISCARD_ROOM               //申请解散房间
+		Messdata: s_id
+		
+	27：SEND_MATCH_USEUP                //房卡局数已用完
+		Messdata: nil
+	
+	28： SEND_RESETTIMER  //重置时间
+	    Messdata: nil
+
+	29： SEND_UNIVERSE_NUM               //精牌的数量
+	    MessData: []int{
+	                type, 
+	                seat_id,
+	                正精牌值，
+	                正精的个数,
+	                副精牌值，
+	                副精的个数
+	            }
+	            
+	            type:
+	                    UNIVERSE_TYPE_UP       = 1 //上精
+                    	UNIVERSE_TYPE_SMILE    = 2 //回头一笑
+                    	UNIVERSE_TYPE_LAND     = 3 //埋地雷
+                    	UNIVERSE_TYPE_OPENGING = 4 //开局上下翻
+                    )
+    30:  SEND_START_SHUFFLE              //开始洗牌
+        MissData: nil
+
+    31:  SEND_TOTAL_SCORE     //玩家总分
+        MissData: score
+
+	32:  SEND_PLAYER_UP                  //玩家上线
+        MissData: s_id
+
+	33:  SEND_DISCARD_CONFIRM            //玩家确认解散房间
+        MissData: s_id
+
+	34:   SEND_DISCARD_CENCEL             //玩家取消解散房间
+        MissData: s_id
+
+	35:  SEND_DISCARD_ROOM               //解散房间
+        MissData: nil

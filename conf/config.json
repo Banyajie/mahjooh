@@ -1,0 +1,39 @@
+{
+    "api_addr":"0.0.0.0:4002",
+    "nsq_addr":"127.0.0.1:4150",
+    "nsq_lookupd_addr": "127.0.0.1:4161",
+
+    "nsq_topic_ws_to_game":"nsq_topic_ws_to_game",
+    "nsq_topic_game_to_ws":"nsq_topic_game_to_ws",
+
+    "nsq_channel_ws_to_game" : "nsq_channel_ws_to_game",
+    "nsq_channel_game_to_ws":"nsq_channel_game_to_ws",
+
+    "nsq_topic_match_to_api":"nsq_topic_match_to_api",
+    "nsq_topic_match_playback_to_api":"nsq_topic_match_playback_to_api",
+    "nsq_topic_match_bill_to_api":"nsq_topic_match_bill_to_api",
+    "nsq_topic_match_turn_to_api":"nsq_topic_match_turn_to_api",
+    "nsq_topic_match_card_to_api":"nsq_topic_match_card_to_api",
+    "nsq_topic_match_score_to_api":"nsq_topic_match_score_to_api",
+    "nsq_topic_match_universe_to_api":"nsq_topic_match_universe_to_api",
+    "nsq_topic_member_record_to_api":"nsq_topic_member_record_to_api",
+    "nsq_topic_room_card_to_api":"nsq_topic_room_card_to_api",
+    "nsq_topic_room_log_to_api":"nsq_topic_room_log_to_api",
+
+    "nsq_channel_match_to_api":"nsq_channel_match_to_api",
+    "nsq_channel_match_playback_to_api":"nsq_channel_match_playback_to_api",
+    "nsq_channel_match_bill_to_api":"nsq_channel_match_bill_to_api",
+    "nsq_channel_match_turn_to_api":"nsq_channel_match_turn_to_api",
+    "nsq_channel_match_card_to_api":"nsq_channel_match_card_to_api",
+    "nsq_channel_match_score_to_api":"nsq_channel_match_score_to_api",
+    "nsq_channel_match_universe_to_api":"nsq_channel_match_universe_to_api",
+    "nsq_channel_member_record_to_api":"nsq_channel_member_record_to_api",
+    "nsq_channel_room_card_to_api":"nsq_channel_room_card_to_api",
+    "nsq_channel_room_log_to_api":"nsq_channel_room_log_to_api",
+
+    "redis_addr" : "192.168.1.66:6379",
+    "redis_prefix" : "chess_",
+    "mysql_db" :"root:Zcgame?1234@tcp(192.168.1.66:3306)/chess?charset=utf8",
+    "deal_spead" : 25,
+    "log_level": "debug"
+}

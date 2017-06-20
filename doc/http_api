@@ -1,0 +1,145 @@
+##http_api
+
+###1：创建房间
+	请求方式：POST
+
+	/alg_api/room
+	请求参数：
+		参数 	是否必须 	说明
+		m_id 	是 	创建人id
+		mc_cnt 	是 	局数
+		option 	是 	可选
+		snake 	是 	霸王
+		universe 	是 	精牌
+		rule 	是 	玩法
+		is_over 	是 	房间局数是否已经玩完 1完 0未完
+		c_name 	是 	创建人
+		m_name 	是 	修改人
+		remark 	是 	备注
+		other 	是 	冗余
+		
+	返回结构：
+	参数 	是否必须 	说明
+
+	{
+		status:"1",
+		msg:"success",
+		r_id:r_id,
+		data: roomset,
+	}
+	
+	type RoomSetting struct {
+	DealSpeed    int  `json:"deal_speed"`    //出牌速度
+	McCnt        int  `json:"mc_cnt"`        //游戏局数
+	Option       bool `json:"option"`        //点炮三家付还是一家付
+	Snake        bool `json:"snake"`         //霸王精 ×2/+10
+	Universe     bool `json:"universe"`      //打出精牌算分
+	SmileBack    bool `json:"smile_back"`    //回头一笑  游戏发牌后，将上局的两张上精牌做以此精分计算
+	LandMines    bool `json:"land_mines"`    //埋地雷/终局上下翻精
+	DownUniverse bool `json:"down_universe"` //无下精
+	TurnRound    bool `json:"turn_round"`    //开局上下翻
+	SameSong     bool `json:"same_song"`     //同一首歌  假设1、2万为精，则1、2条 1、2筒都为精牌
+}
+	
+###2：加入房间
+
+	请求方式：Get
+
+	/alg_api/room/join
+	
+	请求参数：
+		参数 	是否必须 	说明
+		r_id  房间id     主要用来检测该房间可不可以进入
+		
+		
+	返回结构：
+	参数 	是否必须 	说明
+
+	{
+		status:"1",
+		msg:"success",
+		data: roomset
+	}
+	
+	roomset :
+		DealSpeed    int  `json:"deal_speed"`    //出牌速度
+		McCnt        int  `json:"mc_cnt"`        //游戏局数
+		Option       bool `json:"option"`        //点炮三家付还是一家付
+		Snake        bool `json:"snake"`         //霸王精 ×2/+10
+		Universe     bool `json:"universe"`      //打出精牌算分
+		SmileBack    bool `json:"smile_back"`    //回头一笑  游戏发牌后，将上局的两张上精牌做以此精分计算
+		LandMines    bool `json:"land_mines"`    //埋地雷/终局上下翻精
+		DownUniverse bool `json:"down_universe"` //无下精
+		TurnRound    bool `json:"turn_round"`    //开局上下翻
+		SameSong     bool `json:"same_song"`     //同一首歌  假设1、2万为精，则1、2条 1、2筒都为精牌
+		
+###3：返回房间
+	请求方式：Get
+
+	/alg_api/room/return
+	
+	请求参数：
+		参数 	是否必须 	说明
+		r_id  房间id     主要用来检测该房间可不可以进入
+		m_id   玩家id
+		
+	参数 	是否必须 	说明
+
+	{
+		status:"1",
+		msg:"success",
+		data: roomset
+	}
+	
+	roomset :
+		DealSpeed    int  `json:"deal_speed"`    //出牌速度
+		McCnt        int  `json:"mc_cnt"`        //游戏局数
+		Option       bool `json:"option"`        //点炮三家付还是一家付
+		Snake        bool `json:"snake"`         //霸王精 ×2/+10
+		Universe     bool `json:"universe"`      //打出精牌算分
+		SmileBack    bool `json:"smile_back"`    //回头一笑  游戏发牌后，将上局的两张上精牌做以此精分计算
+		LandMines    bool `json:"land_mines"`    //埋地雷/终局上下翻精
+		DownUniverse bool `json:"down_universe"` //无下精
+		TurnRound    bool `json:"turn_round"`    //开局上下翻
+		SameSong     bool `json:"same_song"`     //同一首歌  假设1、2万为精，则1、2条 1、2筒都为精牌
+
+###4: 房间规则
+    请求方式： GET
+    /alg_api/room/rule
+
+    请求参数：
+        r_id 房间id
+
+    回复参数
+        {
+        		status:"1",
+        		msg:"success",
+        		data: roomset
+        	}
+
+    roomset :
+        DealSpeed    int  `json:"deal_speed"`    //出牌速度
+        McCnt        int  `json:"mc_cnt"`        //游戏局数
+        Option       bool `json:"option"`        //点炮三家付还是一家付
+        Snake        bool `json:"snake"`         //霸王精 ×2/+10
+        Universe     bool `json:"universe"`      //打出精牌算分
+        SmileBack    bool `json:"smile_back"`    //回头一笑  游戏发牌后，将上局的两张上精牌做以此精分计算
+        LandMines    bool `json:"land_mines"`    //埋地雷/终局上下翻精
+        DownUniverse bool `json:"down_universe"` //无下精
+        TurnRound    bool `json:"turn_round"`    //开局上下翻
+        SameSong     bool `json:"same_song"`     //同一首歌  假设1、2万为精，则1、2条 1、2筒都为精牌
+
+###5: 判断玩家主页面是创建房间还是返回房间
+    请求方式： GET
+    /alg_api/room/judge
+
+    请求参数：
+        u_id  用户id
+
+
+    回复参数：
+       {
+               		status:"1",
+               		msg:"success",
+               		data: true/false  // bool值
+       }
